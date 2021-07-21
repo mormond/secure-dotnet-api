@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace api
 {
@@ -26,6 +27,13 @@ namespace api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(
+                options =>
+                {
+                    options.Audience = Configuration["ApplicationIdUri"];
+                    options.Authority = $"https://login.microsoftonline.com/{Configuration["TenantId"]}";
+                });
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
@@ -47,6 +55,8 @@ namespace api
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
